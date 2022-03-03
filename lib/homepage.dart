@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fooseonline_admin/app_text.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -9,9 +13,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController name= TextEditingController();
+  TextEditingController price= TextEditingController();
   double textFieldHeight=50;
   String dropDownSizeValue="L";
   String dropDownGenderValue="Male";
+
+  File? image;
+
+  Future pickImage() async{
+    try{
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) {
+        return;
+      }
+      final imageTemporary = File(image.path);
+
+      setState(() {
+        this.image = imageTemporary;
+      });
+    }on PlatformException catch (e){
+      print("access to gallery denied $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,38 +51,54 @@ class _HomePageState extends State<HomePage> {
               child: Form(
                 child: Column(
                   children: [
-                    Container(
-                      height: 70,
-                      width: 70,
-                      decoration: BoxDecoration(
-                          color: Colors.grey
-                      ),
+
+                    GestureDetector(
+                      onTap: pickImage,
+                      child:ClipOval(
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          child: image!=null? Image.file(image!):
+                          Image(image: AssetImage("images/cameraLogo.jpg")),
+                        ),
+                      )
                     ),
 
                     Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: Colors.grey,width: 2
+                        )
+                      ),
                       height: textFieldHeight,
                       margin: EdgeInsets.only(top: 20),
                       child: TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                        keyboardType: TextInputType.text,
+                        controller: name,
+                          decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.people),
-                            labelText: "Name",
                             hintText: "Enter Name",
+                            border: InputBorder.none,
+                              focusColor: Colors.grey
                             // hintStyle: TextStyle(color: hintColor)
                           )),
                     ),
                     Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: Colors.grey,width: 2
+                        )
+                      ),
                       height: textFieldHeight,
-                      margin: EdgeInsets.only(top:20),
+                      margin: const EdgeInsets.only(top:20),
                       child: TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                        keyboardType: TextInputType.number,
+                        controller: price,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
                             prefixIcon: Icon(Icons.money),
-                            labelText: "Price",
                             hintText: "Enter The Price",
                             // hintStyle: TextStyle(color: hintColor)
                           )),
@@ -131,7 +171,18 @@ class _HomePageState extends State<HomePage> {
                               }).toList(),
                             ),
                           ),
-                        )
+                        ),
+                    SizedBox(height: 20,),
+                    Container(
+                      alignment: Alignment.center,
+                      height: textFieldHeight,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: AppText(text: "Add", color: Colors.white,size: 20,),
+                    )
                   ],
                 ),
               ),
