@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -173,15 +174,30 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                     SizedBox(height: 20,),
-                    Container(
-                      alignment: Alignment.center,
-                      height: textFieldHeight,
-                      width: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(15)
+
+
+                    GestureDetector(
+                      onTap: (){
+                        FirebaseFirestore.instance.collection("posts").add(
+                          {
+                            "name":name.text,
+                            "price":price.text,
+                            "sex":dropDownGenderValue,
+                            "size":dropDownSizeValue
+                          }
+                        ).then((value) => print("cloth added"))
+                        .catchError((e)=> print("failed $e"));
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: textFieldHeight,
+                        width: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(15)
+                        ),
+                        child: AppText(text: "Add", color: Colors.white,size: 20,),
                       ),
-                      child: AppText(text: "Add", color: Colors.white,size: 20,),
                     )
                   ],
                 ),
