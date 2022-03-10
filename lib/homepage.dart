@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   TextEditingController name= TextEditingController();
   TextEditingController price= TextEditingController();
   double textFieldHeight=50;
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   File? _image;
 
   storage.FirebaseStorage bucket=storage.FirebaseStorage.instance;
-
+// Function for picking image from the gallery
   Future pickImage() async{
     try{
       final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -42,9 +43,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future uploadFile() async {
+  //function for uploading picked image to firebase storage
+  Future uploadPhoto() async {
     if (_image == null) return;
-    final fileName = basename(_image!.path);
+    final fileName = basename(_image!.path.split("/").last);
     final destination = 'files/$fileName';
 
     try {
@@ -55,6 +57,20 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print('error occured $e');
     }
+  }
+
+  //function for sending parameter to firebase store
+
+  Future uploadParameters() async{
+    FirebaseFirestore.instance.collection("posts").add(
+        {
+          "name":name.text,
+          "price":price.text,
+          "sex":dropDownGenderValue,
+          "size":dropDownSizeValue
+        }
+    ).then((value) => print("cloth added"))
+        .catchError((e)=> print("failed $e"));
   }
 
   @override
@@ -198,18 +214,34 @@ class _HomePageState extends State<HomePage> {
 
                       GestureDetector(
                         onTap: (){
+                          if(_image!=null){
+                            uploadPhoto().then((value)=>ScaffoldMessenger.of(context).
+                            showSnackBar(
+                                const SnackBar(
+                                    backgroundColor: Colors.greenAccent,
+                                    content: AppText(text:"Image succesfully added",color: Colors.black,),
+                                    duration: Duration(seconds: 2)
+                                )
+                            )).catchError((e)=>ScaffoldMessenger.of(context).
+                            showSnackBar(
+                                const SnackBar(
+                                    backgroundColor: Colors.redAccent,
+                                    content: AppText(text:"Image failed to upload",color: Colors.black,),
+                                    duration: Duration(seconds: 2)
+                                ))
+                            );
+                          }else{
+                            uploadPhoto().catchError((e)=>ScaffoldMessenger.of(context).
+                            showSnackBar(
+                                const SnackBar(
+                                    backgroundColor: Colors.redAccent,
+                                    content: AppText(text:"Image failed to upload",color: Colors.black,),
+                                    duration: Duration(seconds: 2)
+                                ))
+                            );
+                          }
 
-                          FirebaseFirestore.instance.collection("posts").add(
-                            {
-                              "name":name.text,
-                              "price":price.text,
-                              "sex":dropDownGenderValue,
-                              "size":dropDownSizeValue
-                            }
-                          ).then((value) => print("cloth added"))
-                          .catchError((e)=> print("failed $e"));
-
-                          uploadFile();
+                          uploadParameters();
                         },
                         child: Container(
                           alignment: Alignment.center,
