@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   TextEditingController name= TextEditingController();
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-//function for textfield and image verification before uploading
+//function for text field and image verification before uploading
   bool verifier(){
     return (name.text==""||price.text==""||_image==null);
   }
@@ -142,7 +142,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    name;
+    name.dispose();
+    price.dispose();
     super.dispose();
   }
 
@@ -158,7 +159,7 @@ class _HomePageState extends State<HomePage> {
             children: [
 
               Container(
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 child: Form(
                   key: _key,
                   child: Column(
@@ -167,11 +168,11 @@ class _HomePageState extends State<HomePage> {
                       GestureDetector(
                         onTap: pickImage,
                         child:ClipOval(
-                          child: Container(
+                          child: SizedBox(
                             height: 100,
                             width: 100,
                             child: _image!=null? Image.file(_image!):
-                            Image(image: AssetImage("images/cameraLogo.jpg")),
+                            const Image(image: AssetImage("images/cameraLogo.jpg")),
                           ),
                         )
                       ),
@@ -184,15 +185,15 @@ class _HomePageState extends State<HomePage> {
                           )
                         ),
                         height: textFieldHeight,
-                        margin: EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 20),
                         child: TextFormField(
                           autofocus: false,
                           validator: _validateInputs,
                           keyboardType: TextInputType.text,
                           controller: name,
                             decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.people),
-                              hintText: "Enter Name",
+                              prefixIcon: Icon(Icons.description),
+                              hintText: "Enter description",
                               border: InputBorder.none,
                                 focusColor: Colors.grey
                               // hintStyle: TextStyle(color: hintColor)
@@ -214,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.money),
-                              hintText: "Enter The Price",
+                              hintText: "Enter Price",
                               // hintStyle: TextStyle(color: hintColor)
                             )),
                       ),
@@ -222,7 +223,7 @@ class _HomePageState extends State<HomePage> {
 
                         Container(
                           height: textFieldHeight,
-                          padding: EdgeInsets.only(left: 10,right: 10),
+                          padding: const EdgeInsets.only(left: 10,right: 10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(
@@ -253,8 +254,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                           Container(
                             height: textFieldHeight,
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.only(top: 20),
+                            padding: const EdgeInsets.all(10),
+                            margin: const EdgeInsets.only(top: 20),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               border: Border.all(
@@ -287,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
 
 
                       GestureDetector(
@@ -303,7 +304,7 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.green,
                             borderRadius: BorderRadius.circular(15)
                           ),
-                          child: AppText(text: "Add", color: Colors.white,size: 20,),
+                          child: const AppText(text: "Add", color: Colors.white,size: 20,),
                         ),
                       )
                     ],
