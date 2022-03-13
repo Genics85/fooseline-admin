@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fooseonline_admin/app_text.dart';
+import 'package:fooseonline_admin/firebase_post.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -52,56 +50,22 @@ class _HomePageState extends State<HomePage> {
       print("access to gallery denied $e");
     }
   }
-
-  //function for uploading picked image to firebase storage
-  storage.FirebaseStorage bucket=storage.FirebaseStorage.instance;
-
-  Future uploadPhoto() async {
-
-    if (_image == null) {return ;}
-
-    final fileName = basename(_image!.path.split("/").last);
-    final destination = 'files/$fileName';
-
-    try {
-      final ref = storage.FirebaseStorage.instance
-          .ref(destination)
-          .child('photos/');
-      await ref.putFile(_image!);
-    } catch (e) {
-      print('error occured $e');
-    }
-
+  // parameters reset after an upload
+  reset(){
     setState(() {
+      name.text="";
+      price.text="";
       _image=null;
     });
-
   }
 
-  //function for sending parameter to firebase store
-
-  Future uploadParameters() async{
-    FirebaseFirestore.instance.collection("posts").add(
-        {
-          "name":name.text,
-          "price":price.text,
-          "sex":dropDownGenderValue,
-          "size":dropDownSizeValue
-        }
-    ).then((value) => print("cloth added"))
-        .catchError((e)=> print("failed $e"));
-
-    setState(() {
-      name.text='';
-      price.text='';
-    });
-  }
 //function for textfield and image verification before uploading
   bool verifier(){
     return (name.text==""||price.text==""||_image==null);
   }
 //function which returns either an upload dialog box or stoping dialog box when a field is empty
   Object add(BuildContext context){
+
     return (
     verifier()?
     showDialog(
@@ -109,7 +73,7 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context){
           return  AlertDialog(
             title: const Text("Uploading an empty field"),
-            content: const Text("Make sure all fields are field"),
+            content: const Text("Make sure all fields are filled"),
             actions: [
               Container(
                 margin:const EdgeInsets.only(right: 15),
@@ -137,18 +101,25 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         InkWell(
                           onTap:(){
+
                             Navigator.pop(context);
 
-                            uploadParameters();
-
-                            uploadPhoto().then((value)=>_scaffoldKey.currentState?.
+                            FirebasePost(size: dropDownSizeValue,
+                            image: _image,
+                            gender: dropDownGenderValue,
+                            name: name.text,
+                            price: price.text).uploadPhoto().then((value)=>_scaffoldKey.currentState?.
                             showSnackBar(
                                 const SnackBar(
                                     backgroundColor: Colors.greenAccent,
-                                    content: AppText(text:"Image succesfully added",color: Colors.black,),
+                                    content: AppText(text:"Image successfully added",color: Colors.black,),
                                     duration: Duration(seconds: 2)
                                 )
                             ));
+
+                            // reset some parameters after an upload
+                            reset();
+
                           },
                           child: const AppText(text:"Continue",color: Colors.black,),
                         ),
@@ -167,6 +138,12 @@ class _HomePageState extends State<HomePage> {
         )
 
     );
+  }
+
+  @override
+  void dispose() {
+    name;
+    super.dispose();
   }
 
   @override
@@ -315,51 +292,8 @@ class _HomePageState extends State<HomePage> {
 
                       GestureDetector(
                         onTap: (){
+                          //function for adding product to the backend
                           add(context);
-
-                          // showDialog(
-                          //     context: context,
-                          //     builder: (BuildContext context){
-                          //       return AlertDialog(
-                          //         title: const Text("Uploading a picture"),
-                          //         content: const Text("Do you wish to continue?"),
-                          //         actions:[
-                          //           Container(
-                          //             margin:const EdgeInsets.only(left: 15,right: 15),
-                          //             child: Row(
-                          //               mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                          //               children: [
-                          //                 InkWell(
-                          //                   onTap:(){
-                          //                     Navigator.pop(context);
-                          //
-                          //                     uploadParameters();
-                          //
-                          //                     uploadPhoto().then((value)=>ScaffoldMessenger.of(context).
-                          //                     showSnackBar(
-                          //                         const SnackBar(
-                          //                             backgroundColor: Colors.greenAccent,
-                          //                             content: AppText(text:"Image succesfully added",color: Colors.black,),
-                          //                             duration: Duration(seconds: 3)
-                          //                         )
-                          //                     ));
-                          //                   },
-                          //                   child: const AppText(text:"Continue",color: Colors.black,),
-                          //                 ),
-                          //                 InkWell(
-                          //                   onTap:(){
-                          //                     Navigator.pop(context);
-                          //                   },
-                          //                   child: const AppText(text:"Cancel", color: Colors.red,),
-                          //                 )
-                          //               ],
-                          //             ),
-                          //           )
-                          //         ],
-                          //       );
-                          //     }
-                          // );
-
                         },
                         child: Container(
                           alignment: Alignment.center,
