@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fooseonline_admin/app_text.dart';
 import 'package:fooseonline_admin/firebase_post.dart';
 import 'package:image_picker/image_picker.dart';
@@ -72,8 +74,10 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context){
           return  AlertDialog(
-            title: const Text("Uploading an empty field"),
-            content: const Text("Make sure all fields are filled"),
+            title: const AppText(text:"Uploading an empty field",color:Colors.black,),
+            content: Container(
+              padding: EdgeInsets.only(top: 20,bottom: 20),
+                child: const AppText(text:"Make sure all fields are filled",color: Colors.red,)),
             actions: [
               Container(
                 margin:const EdgeInsets.only(right: 15),
@@ -81,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                   onTap:(){
                     Navigator.pop(context);
                   },
-                  child:const AppText(text: "Go back",color: Colors.red,),
+                  child:const AppText(text: "Go back",color: Colors.grey,),
                 ),
               )
             ],
@@ -95,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                 content: const Text("Do you wish to continue?"),
                 actions:[
                   Container(
-                    margin:const EdgeInsets.only(left: 15,right: 15),
+                    margin:const EdgeInsets.all(15),
                     child: Row(
                       mainAxisAlignment:MainAxisAlignment.spaceBetween,
                       children: [
@@ -116,12 +120,10 @@ class _HomePageState extends State<HomePage> {
                                     duration: Duration(seconds: 2)
                                 )
                             ));
-
                             // reset some parameters after an upload
                             reset();
-
                           },
-                          child: const AppText(text:"Continue",color: Colors.black,),
+                          child: const AppText(text:"Continue",color: Colors.green,),
                         ),
                         InkWell(
                           onTap:(){
@@ -136,7 +138,6 @@ class _HomePageState extends State<HomePage> {
               );
             }
         )
-
     );
   }
 
@@ -156,15 +157,30 @@ class _HomePageState extends State<HomePage> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
+              Container(
+                width: 70,
+                height: 30,
+                margin: EdgeInsets.only(left: 20),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.red
+                ),
+                child: InkWell(
+                  onTap: (){
+                    FirebaseAuth.instance.signOut();
+                  },
+                  child: AppText(text: "Log Out",color: Colors.white,),
+                ),
+              ),
               Container(
                 margin: const EdgeInsets.all(20),
                 child: Form(
                   key: _key,
                   child: Column(
                     children: [
-
                       GestureDetector(
                         onTap: pickImage,
                         child:ClipOval(
@@ -199,6 +215,7 @@ class _HomePageState extends State<HomePage> {
                               // hintStyle: TextStyle(color: hintColor)
                             )),
                       ),
+
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
@@ -219,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                               // hintStyle: TextStyle(color: hintColor)
                             )),
                       ),
+
                       const SizedBox(height:20),
 
                         Container(
@@ -290,7 +308,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                       const SizedBox(height: 20,),
 
-
                       GestureDetector(
                         onTap: (){
                           //function for adding product to the backend
@@ -306,7 +323,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: const AppText(text: "Add", color: Colors.white,size: 20,),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),

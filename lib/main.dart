@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fooseonline_admin/sign_in_widget.dart';
+import 'SignInPage.dart';
 import 'homepage.dart';
 
 void main() async {
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: SignInPage(),
     );
   }
 }
